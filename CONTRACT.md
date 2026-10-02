@@ -29,10 +29,26 @@ we own.
 
 **The result.** What the build printed for each module.
 
+```
+lab06-api:      Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+lab06-consumer: Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
 **If your prediction was wrong,** say what you missed.
+
+It was right. The consumer didn't notice: its 4-arg calls compiled against the
+same method, and their behavior didn't change because the 4-arg version just
+delegates with `notes = null`.
 
 **Is an additive change always safe in Java?** One case where adding something
 to an API still breaks a caller, if you can name one.
+
+No. Adding an abstract method to `BookingApi` breaks any outside class that
+implements it, since that class no longer compiles until it adds the method.
+A `default` method would avoid that. An overload can also cause ambiguity:
+adding `createBooking(String, long, long, Integer)` would make
+`createBooking(room, s, e, null)` in `FrontDesk` fail to compile.
 
 ---
 

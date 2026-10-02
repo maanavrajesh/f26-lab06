@@ -61,6 +61,20 @@ public interface BookingApi {
                           String waitlistKey);
 
     /**
+     * Same as {@link #createBooking(String, long, long, String)}, and also
+     * attaches free-form notes to the created booking.
+     *
+     * <p>Notes are stored and handed back on {@link Booking#getNotes()}; this
+     * API never interprets them. When no booking is created (conflict with a
+     * null {@code waitlistKey}), the notes are discarded along with it.
+     *
+     * @param notes free-form notes for the booking, or null for none
+     * @see #createBooking(String, long, long, String)
+     */
+    Booking createBooking(String roomId, long startMinute, long endMinute,
+                          String waitlistKey, String notes);
+
+    /**
      * Returns every non-cancelled booking for one room, ordered by start minute.
      *
      * <p>Both CONFIRMED and WAITLISTED bookings are included; CANCELLED
