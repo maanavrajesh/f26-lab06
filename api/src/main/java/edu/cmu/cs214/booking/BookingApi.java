@@ -63,6 +63,34 @@ public interface BookingApi {
     Booking createBooking(BookingRequest request);
 
     /**
+     * Books a room with no notes.
+     *
+     * @deprecated Use {@link #createBooking(BookingRequest)}, passing
+     *             {@code new BookingRequest(roomId, startMinute, endMinute,
+     *             waitlistKey, null)}. Behaves identically.
+     */
+    @Deprecated
+    default Booking createBooking(String roomId, long startMinute, long endMinute,
+                                  String waitlistKey) {
+        return createBooking(new BookingRequest(roomId, startMinute, endMinute,
+                waitlistKey, null));
+    }
+
+    /**
+     * Books a room with notes.
+     *
+     * @deprecated Use {@link #createBooking(BookingRequest)}, passing
+     *             {@code new BookingRequest(roomId, startMinute, endMinute,
+     *             waitlistKey, notes)}. Behaves identically.
+     */
+    @Deprecated
+    default Booking createBooking(String roomId, long startMinute, long endMinute,
+                                  String waitlistKey, String notes) {
+        return createBooking(new BookingRequest(roomId, startMinute, endMinute,
+                waitlistKey, notes));
+    }
+
+    /**
      * Returns every non-cancelled booking for one room, ordered by start minute.
      *
      * <p>Both CONFIRMED and WAITLISTED bookings are included; CANCELLED

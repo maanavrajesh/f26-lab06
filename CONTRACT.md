@@ -104,14 +104,36 @@ which we don't control, catches it.
 
 **What you added.** The signatures that came back, and what they delegate to.
 
+`@Deprecated createBooking(String, long, long, String)` and
+`@Deprecated createBooking(String, long, long, String, String)`, both as
+`default` methods on `BookingApi`. Each one wraps its arguments in a
+`new BookingRequest(...)` (notes `null` for the 4-arg version) and calls
+`createBooking(BookingRequest)`.
+
 **The warnings.** Paste one deprecation warning line from the build log (from
 a `mvn -B clean test` run, since a rerun with nothing to compile prints none).
+
+```
+[WARNING] .../consumer/src/main/java/edu/cmu/cs214/frontdesk/FrontDesk.java:[27,19] createBooking(java.lang.String,long,long,java.lang.String) in edu.cmu.cs214.booking.BookingApi has been deprecated
+```
+
+There's a matching warning for line 33. The build went from FAILURE to
+SUCCESS: api 5/5, consumer 7/7.
 
 **What the deprecation path resolves.** Who can now build that could not build
 during step 1, and who is on which schedule.
 
+The front desk team can build and pass again without changing anything. We
+moved to the new API immediately, and they can migrate whenever they choose,
+until we actually remove the old overloads.
+
 **What the warnings accomplish that a README note would not.** Be concrete
 about where the warning shows up and who sees it without looking for it.
+
+The warning appears in the consumer team's own build output, at their exact
+file and line, every time they compile. They don't have to go looking for it
+the way they'd have to find a note in our README. The `@deprecated` javadoc
+also shows up in their IDE and names the replacement.
 
 ---
 
