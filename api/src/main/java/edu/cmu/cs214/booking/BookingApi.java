@@ -47,32 +47,20 @@ public interface BookingApi {
      * <p>Ids are assigned by the implementation, are unique, and increase in
      * creation order.
      *
-     * @param roomId      the room to book, non-null
-     * @param startMinute first minute of the booking, inclusive
-     * @param endMinute   first minute after the booking, exclusive; must be
-     *                    greater than {@code startMinute}
-     * @param waitlistKey caller's waitlist key, or null to decline waitlisting
+     * <p>Notes are stored and handed back on {@link Booking#getNotes()}; this
+     * API never interprets them. When no booking is created, the notes are
+     * discarded along with it.
+     *
+     * @param request the room, range, waitlist key, and notes; the fields carry
+     *                the meanings above ({@code roomId} non-null,
+     *                {@code endMinute} greater than {@code startMinute})
      * @return the CONFIRMED booking, the WAITLISTED booking, or null when the
      *         range conflicts and no waitlist key was given
-     * @throws IllegalArgumentException if {@code roomId} is null or
-     *         {@code endMinute} is not greater than {@code startMinute}
+     * @throws IllegalArgumentException if {@code request} or its
+     *         {@code roomId} is null, or {@code endMinute} is not greater than
+     *         {@code startMinute}
      */
-    Booking createBooking(String roomId, long startMinute, long endMinute,
-                          String waitlistKey);
-
-    /**
-     * Same as {@link #createBooking(String, long, long, String)}, and also
-     * attaches free-form notes to the created booking.
-     *
-     * <p>Notes are stored and handed back on {@link Booking#getNotes()}; this
-     * API never interprets them. When no booking is created (conflict with a
-     * null {@code waitlistKey}), the notes are discarded along with it.
-     *
-     * @param notes free-form notes for the booking, or null for none
-     * @see #createBooking(String, long, long, String)
-     */
-    Booking createBooking(String roomId, long startMinute, long endMinute,
-                          String waitlistKey, String notes);
+    Booking createBooking(BookingRequest request);
 
     /**
      * Returns every non-cancelled booking for one room, ordered by start minute.

@@ -80,8 +80,25 @@ the new signature, but we can't rewrite theirs.
 **What the build printed.** Paste it for each module, including file and
 line for anything that failed.
 
+```
+lab06-api:      Tests run: 5, Failures: 0, Errors: 0, Skipped: 0   -> SUCCESS
+lab06-consumer: COMPILATION ERROR                                  -> FAILURE
+FrontDesk.java:[27,19] method createBooking in interface edu.cmu.cs214.booking.BookingApi cannot be applied to given types;
+  required: edu.cmu.cs214.booking.BookingRequest
+  found:    java.lang.String,long,long,<nulltype>
+FrontDesk.java:[33,19] method createBooking in interface edu.cmu.cs214.booking.BookingApi cannot be applied to given types;
+  required: edu.cmu.cs214.booking.BookingRequest
+  found:    java.lang.String,long,long,java.lang.String
+BUILD FAILURE
+```
+
 **Which module's tests ran, and which did not.** And what that tells you about
 who can detect a contract break.
+
+Only the api's 5 tests ran, and they were green. The consumer failed at
+`compile`, so none of its 7 tests ran. Our own suite can't detect a contract
+break, because we update it along with the change. Only the caller's code,
+which we don't control, catches it.
 
 ### Step 2: the deprecation path
 
