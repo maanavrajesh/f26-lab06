@@ -13,8 +13,17 @@ Keep it short and specific. Point at methods, call sites, and error text.
 
 **Will the consumer, untouched, still compile and pass?** Yes or no.
 
+Yes.
+
 **Why.** What does the compiler do with the consumer's existing call sites once
 the new overload exists?
+
+Java picks an overload at compile time partly by argument count. Both
+`FrontDesk` calls (lines 27 and 33) pass 4 arguments, so they still bind to
+the 4-arg `createBooking` and can't match the 5-arg one, even the `null` call.
+The consumer only calls `BookingApi` and doesn't implement it, so the new
+abstract method only has to be implemented in `InMemoryBookingService`, which
+we own.
 
 ### What happened
 
