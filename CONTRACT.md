@@ -145,20 +145,51 @@ Not coded. One misuse, one redesign, one cost. Discuss it with your TA.
 
 **What is easy to get wrong.** One specific thing about the API surface.
 
+The boolean flag on `cancelBooking(long bookingId, boolean notifyWaitlist)`.
+`true` and `false` don't say what they mean, and both are valid, so passing
+the wrong one still compiles.
+
 **The call site.** File and line in `consumer/`, with the call. Show the
 code that a reader cannot understand without opening the javadoc, or that a
 caller could get wrong with the compiler still happy.
 
+`FrontDesk.java:48`: `api.cancelBooking(bookingId, true);`
+`FrontDesk.java:53`: `api.cancelBooking(bookingId, false);`
+
+Without the javadoc or the method names around them, you can't tell which
+call promotes a waitlisted guest.
+
 **What goes wrong when it happens.** Silent bad behavior, wrong data, a crash
 somewhere far away?
+
+Silent wrong behavior. Flip the flag in `cancelQuietly` and a desk typo
+correction gives the room to a waitlisted guest. Flip it the other way and
+the waitlisted guest never gets the room. Neither case throws an error.
 
 ### The redesign
 
 **The proposal.** Types, enums, factories, or whatever you are proposing. Show
 the new signature and the new call site.
 
+```java
+public enum WaitlistAction { PROMOTE_NEXT, LEAVE_WAITLISTED }
+
+boolean cancelBooking(long bookingId, WaitlistAction action);
+
+// FrontDesk
+api.cancelBooking(bookingId, WaitlistAction.PROMOTE_NEXT);
+api.cancelBooking(bookingId, WaitlistAction.LEAVE_WAITLISTED);
+```
+
 **Why the mistake is now hard or impossible to make.** Point at the mechanism,
 such as the compiler, a validating constructor, or an exhaustive switch.
+
+The compiler's type check. A bare `true` or `false` no longer compiles, so
+every call has to name what it does, and a wrong choice is visible when
+reading the line. Adding a third action later (for example "notify all") is
+also caught by an exhaustive `switch` in the implementation. This doesn't
+stop someone from picking the wrong constant on purpose, but it makes the
+mistake visible.
 
 ### One tradeoff
 
@@ -166,4 +197,15 @@ such as the compiler, a validating constructor, or an exhaustive switch.
 against the deprecation path you just built, or more types for a newcomer to
 learn. "No real downside" does not count.
 
+It's another breaking change, so it needs a second deprecation cycle:
+`cancelBooking(long, boolean)` stays as a `@Deprecated` method that maps to
+the enum, and the consumer gets more warnings. Callers that compute the flag
+(say `cancelBooking(id, guestAsked)`) now need a ternary to convert it to the
+enum.
+
 **When the price is worth paying.** A condition under which it is.
+
+When the mistake has real consequences that nobody would notice. Here, giving
+away a room nobody released is a real-world harm that no test would catch.
+It's also cheaper to do while there's only one consumer, before more callers
+are relying on the boolean.
