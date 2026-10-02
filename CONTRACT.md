@@ -59,10 +59,21 @@ adding `createBooking(String, long, long, Integer)` would make
 **Will the untouched consumer still compile and pass?** Yes or no, and if no,
 which module goes red and whether at compile time or test time.
 
+No. `lab06-consumer` goes red at compile time (`compile`, before any of its
+tests run), because the positional `createBooking` it calls no longer exists.
+
 **Where.** Name the call sites you expect to be affected, if any.
+
+`FrontDesk.java` line 27 (`bookWalkIn`) and line 33 (`joinWaitlist`), both
+calling `api.createBooking(roomId, start, end, key)`. `listBookings` and
+`cancelBooking` are unchanged, so those calls are fine.
 
 **What about the tests in `api/`, after you update them?** And whether their
 result is evidence about the consumer.
+
+They should pass 5/5, since the behavior is the same and only the call shape
+changed. That says nothing about the consumer: we rewrote our own tests to
+the new signature, but we can't rewrite theirs.
 
 ### Step 1: after the fold
 
